@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import Frame, ttk 
 from tkinter.constants import BOTH, BOTTOM,  FLAT, LEFT, N,  SOLID, SUNKEN, TOP, W
 import time
+from typing import Generator
+
 
 
 class RecetaMedica(tk.Frame):
@@ -26,7 +28,7 @@ class RecetaMedica(tk.Frame):
         self.AñadirReceta()
         self.IndicacionesAdicionales()
         self.MedicoEncargado()
-        tk.Button(self,text="Guardar",background="#16398a",fg="white",font="Times 14 ").pack(side=LEFT,fill=BOTH,padx=10,pady=5)
+        tk.Button(self,text="Guardar",background="#16398a",fg="white",font="Times 14 ",command= self.crearTXT ).pack(side=LEFT,fill=BOTH,padx=10,pady=5)
 
     def Encabezado(self):
         encabezado = """ ESCUELA SUPERIOR POLITECNICA DE CHIMBORAZO \n    FACULTAD DE SALUD PUBLICA \nCARRERA DE MEDICINA\n\nRECETA ELECTRÓNICA"""   
@@ -58,40 +60,51 @@ class RecetaMedica(tk.Frame):
         self.frmDatos.rowconfigure(1, weight=1)
         self.frmDatos.columnconfigure(1, weight=1)
 
-        
-        
-
+        #NOMBRE
         self.lblNombre = tk.Label(self.frmDatos,text="Nombre :",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=0,column=0,sticky="ws")
         self.txtNombre = tk.Entry(self.frmDatos,relief=FLAT,width=23)
         ttk.Separator(self,orient=tk.HORIZONTAL).place(x=120,y=138,width=125)
         self.txtNombre.focus()
         self.txtNombre.grid(row=0,column=1,sticky="nws")
 
+        #RECETA
         tk.Label(self.frmDatos, text= " N° Receta : " , fg="black",font="Times 14 ",justify=tk.RIGHT,background="white").grid(row=0,column=3,sticky="w")
-        self.txtReceta = tk.Entry(self.frmDatos,relief=FLAT).grid(row=0,column=4,sticky="e")
+        self.txtReceta = tk.Entry(self.frmDatos,relief=FLAT)
         ttk.Separator(self,orient=tk.HORIZONTAL).place(x=390,y=140,width=123)
+        self.txtReceta.grid(row=0,column=4,sticky="e")
 
+        #EDAD
         tk.Label(self.frmDatos,text="Edad :",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=1,column=0,sticky="w")
-        self.txtEdad = tk.Spinbox(self.frmDatos,from_=1,to=100,width=7).grid(row=1,column=1,sticky="w")
-        #ttk.Separator(self,orient=tk.HORIZONTAL).place(x=120,y=168,width=120)
+        self.txtEdad = tk.Spinbox(self.frmDatos,from_=1,to=100,width=7)
+        self.txtEdad.grid(row=1,column=1,sticky="w")
 
+        #CEDULA
         self.lblCI = tk.Label(self.frmDatos,text="CI :",fg="black",font="Times 14 ",justify=tk.RIGHT,background="white").grid(row=1,column=3,sticky="w")
-        self.txtCI = tk.Entry(self.frmDatos,relief=FLAT).grid(row=1,column=4,sticky="e")
+        self.txtCI = tk.Entry(self.frmDatos,relief=FLAT)
         ttk.Separator(self,orient=tk.HORIZONTAL).place(x=390,y=165,width=123)
+        self.txtCI.grid(row=1,column=4,sticky="e")
 
+        #CELULAR
         self.lblPhone = tk.Label(self.frmDatos,text="Celular : ",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=2,column=0,sticky="w")
-        self.txtPhone = tk.Entry(self.frmDatos,relief=FLAT).grid(row=2,column=1,sticky="w")
+        self.txtPhone = tk.Entry(self.frmDatos,relief=FLAT)
         ttk.Separator(self,orient=tk.HORIZONTAL).place(x=120,y=190,width=120)
+        self.txtPhone.grid(row=2,column=1,sticky="w")
 
+        #CORREO
         self.lblEmail = tk.Label(self.frmDatos,text="Email :",fg="black",font="Times 14 ",justify=tk.RIGHT,background="white").grid(row=2,column=3,sticky="w")
-        self.txtEmail = tk.Entry(self.frmDatos,relief=FLAT).grid(row=2,column=4,sticky="e")
+        self.txtEmail = tk.Entry(self.frmDatos,relief=FLAT)
         ttk.Separator(self,orient=tk.HORIZONTAL).place(x=390,y=190,width=123)
+        self.txtEmail.grid(row=2,column=4,sticky="e")
 
+        #SEXO
         self.lblSex = ttk.Label(self.frmDatos,text="Sexo : ",font="Times 14",justify=tk.LEFT,background="white").grid(row=3,column=0,sticky="w") #ttk.Label(frmDatos,text="Sexo",fg="black",font="Times 14 ",justify=tk.LEFT).grid(row=3,column=0,sticky="w")
-        self.cmbSex = ttk.Combobox(self.frmDatos,width=17,values=["Masculino","Femenino"]).grid(row=3,column=1,sticky="w")
+        self.cmbSex = ttk.Combobox(self.frmDatos,width=17,values=["Masculino","Femenino"])
+        self.cmbSex.grid(row=3,column=1,sticky="w")
 
+        #FECHA
         self.lblDate = tk.Label(self.frmDatos,text="Fecha : ",fg="black",font="Times 14 ",justify=tk.RIGHT,background="white").grid(row=3,column=3,sticky="w")
-        self.txtDate = tk.Label(self.frmDatos,background="white",text=time.strftime("%x"),fg="black",font="Times 14 ",justify=LEFT).grid(row=3,column=4,sticky="w")
+        self.txtDate = tk.Label(self.frmDatos,background="white",text=time.strftime("%x"),fg="black",font="Times 14 ",justify=LEFT)
+        self.txtDate.grid(row=3,column=4,sticky="w")
 
         self.frmDatos.pack(padx=40,pady=15,fill="x")
 
@@ -202,12 +215,36 @@ class RecetaMedica(tk.Frame):
         
         self.frmMedico.pack(padx=155,pady=2,fill="x")
 
+   
     def Medico(self):
         #registra = tk.Toplevel()
         #registra.title("Añadir datos")
         #registra.config(background="white")
         pass
-  
+        
+    def crearTXT(self):
+        self.FileName = str(self.txtNombre.get()) + ".txt"
+        print(self.FileName)   
+        archivo = open(self.FileName, 'a') # abre el archivo datos.txt
+        archivo.write('\t\t\t\tESCUELA SUPERIOR POLITECNICA DE CHIMBORAZO\n') #escribir en el archivo  
+        archivo.write('\t\t\t\t\tFACULTAD DE SALUD PUBLICA\n')
+        archivo.write('\t\t\t\t\tCARRERA DE MEDICINA \n') 
+        archivo.write('\t\t\t\t\tRECETA ELECTRONICA\n') 
+        archivo.write('\tDATOS DEL PACIENTE\n') 
+        archivo.write('\tNOMBRES Y APELLIDOS: ' + str(self.txtNombre.get()) + '\tReceta N°: 1\n' ) 
+        archivo.write('\tEDAD:' + str(self.txtEdad.get() ) +  '\t\tFecha de peticion' + str(self.now.day) + '\n')
+        archivo.write('\tCELULAR:' + str(self.txtPhone.get()) + '\n')
+        archivo.write('\tSEXO:' + str(self.cmbSex.get()) + '\n')
+        archivo.write('\tCORREO: ' + str(self.txtEmail) + '\n')
+        archivo.write('\n\t------------------------ R E C E T A  --------------------\n')
+
+        archivo.write('\n\t\t\t|--Medico encargado---------|\n')    
+        archivo.write('\t\t\t|Nombre: ' + self.nombreM + '\n')         
+        archivo.write('\t\t\t|CI: '+ self.cedulaM +'\n') 
+
+
+        print("Receta creada exitosamente .....")
+        archivo.close() #cerrar el archivo
 
 class Register(tk.Frame):
 
