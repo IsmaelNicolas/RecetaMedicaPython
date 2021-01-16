@@ -1,12 +1,9 @@
-
-from enum import Flag
+from datetime import datetime
 import tkinter as tk
 from tkinter import Frame, ttk 
-from tkinter.constants import BOTH, BOTTOM,  FLAT, LEFT, N,  SOLID, SUNKEN, TOP, W
+from tkinter.constants import BOTH, BOTTOM, END,  FLAT, LEFT, N,  SOLID, SUNKEN, TOP, W
 import time
-from typing import Generator
-
-
+from fpdf import FPDF
 
 class RecetaMedica(tk.Frame):
     
@@ -15,6 +12,10 @@ class RecetaMedica(tk.Frame):
         #self.Medico()
         self.nombreM = Medico
         self.cedulaM = Cedula
+
+        self.now = datetime.now()
+        self.num = 1
+        self.data = []
 
         self.master=master
         self.master.focus()
@@ -170,26 +171,32 @@ class RecetaMedica(tk.Frame):
         
         añadir.focus()
 
+
         lbl1 = tk.Label(añadir,text="Preescripcion :",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=0,column=0,sticky="w")
         self.txtPresscripcion = tk.Entry(añadir, width=50,relief=SOLID)
         self.txtPresscripcion.focus()
         self.txtPresscripcion.grid(row=0,column=1,sticky="wnse",columnspan=4,pady=7)
 
         tk.Label(añadir,text="Unidades por toma:",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=1,column=0,sticky="w")
-        self.spnUnit = tk.Spinbox(añadir,from_=1,to=7,width=7).grid(row=1,column=1,sticky="w",pady=7)
+        self.spnUnit = tk.Spinbox(añadir,from_=1,to=7,width=7)
+        self.spnUnit.grid(row=1,column=1,sticky="w",pady=7)
 
         tk.Label(añadir,text="Periodo:",fg="black",font="Times 14 ",justify=tk.RIGHT,background="white").grid(row=1,column=2,sticky="w")
-        self.spnPeriod = tk.Entry(añadir,relief=SOLID).grid(row=1,column=3,sticky="e")#tk.Spinbox(añadir,from_=1,to=24,width=7).grid(row=1,column=3,sticky="w")
+        self.txtPeriod = tk.Entry(añadir,relief=SOLID)#tk.Spinbox(añadir,from_=1,to=24,width=7).grid(row=1,column=3,sticky="w")
         #tk.Label(añadir,text="Horas",fg="black",font="Times 14 ",justify=tk.RIGHT,background="white").grid(row=1,column=4,sticky="w",pady=7)
+        self.txtPeriod.grid(row=1,column=3,sticky="e")
 
         tk.Label(añadir,text="Observaciones: ",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=2,column=0,sticky="w")
-        self.txtObservation = tk.Entry(añadir,relief=SOLID).grid(row=2,column=1,sticky="wnse",columnspan=4,pady=7)
+        self.txtObservation = tk.Entry(añadir,relief=SOLID)
+        self.txtObservation.grid(row=2,column=1,sticky="wnse",columnspan=4,pady=7)
 
         ttk.Label(añadir,text="Duracion Tratamiento: ",font="Times 14",justify=tk.CENTER,background="white").grid(row=3,column=0,sticky="w") #ttk.Label(frmDatos,text="Sexo",fg="black",font="Times 14 ",justify=tk.LEFT).grid(row=3,column=0,sticky="w")
-        self.spnDuration = tk.Spinbox(añadir,from_=1,to=7,width=7).grid(row=3,column=1,sticky="w")
+        self.spnDuration = tk.Spinbox(añadir,from_=1,to=7,width=7)
         tk.Label(añadir,text="Dias",fg="black",font="Times 14 ",justify=tk.LEFT,background="white").grid(row=3,column=2,sticky="w",pady=7)
+        self.spnDuration.grid(row=3,column=1,sticky="w")
 
-        btnAñadir = tk.Button(añadir,text="Añadir",background="#16398a",fg="white").grid(row=3,column=3,columnspan=2,sticky="nsew",pady=7)
+        self.btnAñadir = tk.Button(añadir,text="Añadir",background="#16398a",fg="white",command=self.guardarEnLista)
+        self.btnAñadir.grid(row=3,column=3,columnspan=2,sticky="nsew",pady=7)
         
     def IndicacionesAdicionales(self):
         self.frmIndicaciones = tk.Frame(self,relief=SOLID,bd=1,height=7)
@@ -216,11 +223,22 @@ class RecetaMedica(tk.Frame):
         self.frmMedico.pack(padx=155,pady=2,fill="x")
 
    
-    def Medico(self):
-        #registra = tk.Toplevel()
-        #registra.title("Añadir datos")
-        #registra.config(background="white")
-        pass
+    def guardarEnLista(self):
+
+        preescripcion = str(self.txtPresscripcion.get())
+        unidad = str(self.spnUnit.get())
+        periodo = str(self.txtPeriod.get())
+        observacion = str(self.txtObservation.get())
+        duracion = str(self.spnDuration.get())
+        datos = [self.num,preescripcion,unidad,periodo,duracion,observacion]
+        self.table.insert("",self.num,text = str(self.num),values= (self.num,preescripcion,unidad,periodo,observacion,duracion) )
+        self.data.append(datos)
+        self.num += 1
+        self.txtPresscripcion.delete(0,END)
+        self.txtPeriod.delete(0,END)
+        self.txtObservation.delete(0,END)
+        self.spnUnit.delete(0,END)
+        self.spnDuration.delete(0,END)
         
     def crearTXT(self):
         self.FileName = str(self.txtNombre.get()) + ".txt"
@@ -237,15 +255,22 @@ class RecetaMedica(tk.Frame):
         archivo.write('\tSEXO:' + str(self.cmbSex.get()) + '\n')
         archivo.write('\tCORREO: ' + str(self.txtEmail) + '\n')
         archivo.write('\n\t------------------------ R E C E T A  --------------------\n')
-
+        for i in range(0,len(self.data)):
+            archivo.write('\t')
+            for j in range(0,5):
+                archivo.write(str(self.data[i][j] ) + ' | ' )
+            archivo.write('\n')
         archivo.write('\n\t\t\t|--Medico encargado---------|\n')    
         archivo.write('\t\t\t|Nombre: ' + self.nombreM + '\n')         
         archivo.write('\t\t\t|CI: '+ self.cedulaM +'\n') 
 
-
+        
         print("Receta creada exitosamente .....")
         archivo.close() #cerrar el archivo
 
+        #self.convert()
+
+        
 class Register(tk.Frame):
 
     def __init__(self,master=None):
@@ -296,6 +321,19 @@ class Register(tk.Frame):
         
     def salir(self):
         self.master.destroy()
+
+class PDF():
+    def __init__(self,archivo):
+        self.FileName = archivo
+
+    def crearPDF(self):
+        pdf = FPDF()
+        pdf.add_page()
+        file = open(self.FileName,"r")
+        
+
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()
