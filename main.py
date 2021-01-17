@@ -17,12 +17,13 @@ class RecetaMedica(tk.Frame):
         self.num = 1
         self.data = []
 
+     
         self.master=master
         self.master.focus()
         self.pack()
         self.config(background="white")
         self.master.title("Receta medica")
-        self.master.geometry("550x700")
+        self.master.geometry("550x650")
         self.Encabezado()
         self.DatosDelPaciente()
         self.Preescripcion()
@@ -205,19 +206,19 @@ class RecetaMedica(tk.Frame):
         justify=tk.LEFT,anchor=W,
         background="white",relief=FLAT,
         font="Times 11").pack(side=TOP,expand=False,fill="x")
-        self.Indicaciones = tk.Text(self.frmIndicaciones,relief=FLAT,height=4,font="Times 13").pack(side=LEFT,expand=False)
-        
+        self.Indicaciones = tk.Text(self.frmIndicaciones,relief=FLAT,height=4,font="Times 13")
+        self.Indicaciones.pack(side=LEFT,expand=False)
 
         self.frmIndicaciones.pack(padx=15,fill="x")
 
     def MedicoEncargado(self):
-        self.frmMedico = tk.Frame(self,relief=FLAT,height=50)
+        self.frmMedico = tk.Frame(self,relief=FLAT,height=10)
 
-        tk.Label(self.frmMedico,text="Cedula:  " + self.cedulaM ,justify=tk.LEFT,anchor=W,background="white",relief=FLAT,font="Times 10").pack(side=BOTTOM,expand=False,fill="x")
-        tk.Label(self.frmMedico,text="Nombre:  " + self.nombreM ,justify=tk.LEFT,anchor=W,background="white",relief=FLAT,font="Times 10").pack(side=BOTTOM,expand=False,fill="x")
-        tk.Label(self.frmMedico,text="Firma,sello del medico",justify=tk.LEFT,anchor=N,background="white",relief=FLAT,font="Times 10").pack(side=BOTTOM,expand=False,fill="x")
-        tk.Text(self.frmMedico,relief=FLAT,height=3).pack(side=LEFT,expand=False)
-        ttk.Separator(self.frmMedico,orient=tk.HORIZONTAL).place(x=30,y=55,width=180)
+        tk.Label(self.frmMedico,text="Cedula:  " + self.cedulaM ,justify=tk.CENTER,anchor=W,background="white",relief=FLAT,font="Times 15").pack(side=BOTTOM,expand=False,fill="x")
+        tk.Label(self.frmMedico,text="Medico:  " + self.nombreM ,justify=tk.CENTER,anchor=W,background="white",relief=FLAT,font="Times 15").pack(side=BOTTOM,expand=False,fill="x")
+        #tk.Label(self.frmMedico,text="Firma,sello del medico",justify=tk.LEFT,anchor=N,background="white",relief=FLAT,font="Times 10").pack(side=BOTTOM,expand=False,fill="x")
+        #tk.Text(self.frmMedico,relief=FLAT,height=3).pack(side=LEFT,expand=False)
+        #ttk.Separator(self.frmMedico,orient=tk.HORIZONTAL).place(x=30,y=55,width=180)
                 
         
         self.frmMedico.pack(padx=155,pady=2,fill="x")
@@ -241,40 +242,43 @@ class RecetaMedica(tk.Frame):
         self.spnDuration.delete(0,END)
         
     def crearTXT(self):
-        self.FileName = str(self.txtNombre.get()) + ".txt"
-        print(self.FileName)   
-        archivo = open(self.FileName, 'a') # abre el archivo datos.txt
-        archivo.write('\t\t\t\tESCUELA SUPERIOR POLITECNICA DE CHIMBORAZO\n') #escribir en el archivo  
-        archivo.write('\t\t\t\t\tFACULTAD DE SALUD PUBLICA\n')
-        archivo.write('\t\t\t\t\tCARRERA DE MEDICINA \n') 
-        archivo.write('\t\t\t\t\tRECETA ELECTRONICA\n') 
-        archivo.write('\tDATOS DEL PACIENTE\n') 
-        archivo.write('\tNOMBRES Y APELLIDOS: ' + str(self.txtNombre.get()) + '\tReceta N°: 1\n' ) 
-        archivo.write('\tEDAD:' + str(self.txtEdad.get() ) +  '\t\tFecha de peticion' + str(self.now.day) + '\n')
-        archivo.write('\tCELULAR:' + str(self.txtPhone.get()) + '\n')
-        archivo.write('\tSEXO:' + str(self.cmbSex.get()) + '\n')
-        archivo.write('\tCORREO: ' + str(self.txtEmail) + '\n')
-        archivo.write('\n\t------------------------ R E C E T A  --------------------\n')
-        for i in range(0,len(self.data)):
-            archivo.write('\t')
-            for j in range(0,5):
-                archivo.write(str(self.data[i][j] ) + ' | ' )
-            archivo.write('\n')
-        archivo.write('\n\t\t\t|--Medico encargado---------|\n')    
-        archivo.write('\t\t\t|Nombre: ' + self.nombreM + '\n')         
-        archivo.write('\t\t\t|CI: '+ self.cedulaM +'\n') 
+        self.FileName = str(self.txtNombre.get()) + ".pdf"
+        
+        pdf = PDF(nombre = str(self.txtNombre.get()),
+                edad = str(self.txtEdad.get() ),
+                celular = str(self.txtPhone.get()),
+                sexo = str(self.cmbSex.get()),
+                cedula= str(self.txtCI.get()),
+                correo=  str(self.txtEmail.get()),
+                fecha= str(self.now.day),
+                data= self.data, 
+                medico = str(self.nombreM),
+                CMedico= str(self.cedulaM),
+                indicaciones= str(self.Indicaciones.get("1.0",END)),
+                Narchivo= self.FileName
+        )
+        pdf.crearPDF()
+
+        #limpieza
+        self.txtNombre.delete(0,END)
+        self.txtCI.delete(0,END)
+        self.txtEdad.delete(0,END)
+        self.txtEmail.delete(0,END)
+        self.txtPhone.delete(0,END)
+        self.cmbSex.delete(0,END)
+        #self.Indicaciones.delete("1.0",END)
+
 
         
         print("Receta creada exitosamente .....")
-        archivo.close() #cerrar el archivo
+       
 
-        #self.convert()
-
-        
 class Register(tk.Frame):
 
     def __init__(self,master=None):
         super().__init__(master)
+
+        
 
         self.master=master
         self.master.title("Registrar médico")
@@ -323,19 +327,131 @@ class Register(tk.Frame):
         self.master.destroy()
 
 class PDF():
-    def __init__(self,archivo):
-        self.FileName = archivo
+    def __init__(self,nombre = "" ,edad = " " ,
+                 cedula = " ",celular = " ",sexo = " ",
+                 fecha = " ", correo = " ",data = [],
+                 indicaciones = "",medico = "",CMedico = "" , Narchivo = ""):
+        super().__init__()
+        self.nombre = nombre
+        self.edad = edad
+        self.cedula = cedula
+        self.celular = celular
+        self.sexo = sexo
+        self.fecha = fecha
+        self.correo = correo
+        self.data = data
+        self.indicaciones = indicaciones
+        self.medico = medico
+        self.CMedico = CMedico
+        self.NombreArchivo = Narchivo
 
     def crearPDF(self):
         pdf = FPDF()
         pdf.add_page()
-        file = open(self.FileName,"r")
+        #file = open(self.FileName,"r")
+        #Crear encabezado
+        pdf.set_font('Times','B',13)
+        pdf.image('logo2.png', 10, 8, 33)
+        pdf.image('logo1.png', 167, 8, 33)
+        pdf.cell(0,15,"\t\t\t\tESCUELA SUPERIOR POLITECNICA DE CHIMBORAZO",align='C',ln=1)
+        pdf.cell(0,0,"FACULTAD DE SALUD PUBLICA",align='C',ln=1)
+        pdf.cell(0,15,"CARRERA DE MEDICINA",align='C',ln=1)
+        pdf.cell(0,15,"RECETA ELECTRONICA",align='C',ln=1)
+
+        #datos del paciente
+        pdf.set_font('Times','B',size=13)
+        pdf.cell(0,10,"Datos del paciente: ",align='L',ln=1)
+        pdf.set_font('Times',size=12.5)
+        pdf.cell(0,0,"Nombre y apellido : " + self.nombre ,align='L',ln=1)
+        pdf.cell(0,10,"Edad : " + self.edad ,align='L',ln=1)
+        pdf.cell(0,0,"Cedula : " + self.cedula ,align='L',ln=2)
+        pdf.cell(0,10,"Celular : " + self.celular ,align='L',ln=1)
+        pdf.cell(0,0,"Correo : " + self.correo ,align='L',ln=2)
         
+        #Tabla
+
+        pdf.set_font('Times','B',size=12)
+        pdf.cell(0,7,ln=2)
+        x = pdf.get_x()
+        y = pdf.get_y()
+        pdf.multi_cell(110,7,"POSOLOGIA",border=1,align='C')
+        pdf.set_xy(x+110,y)
+        pdf.multi_cell(80,7,"INDICACIONES",border=1,align='C')
+        #Tabla posologia
+        pdf.set_font('Times',size=12)
+        x = pdf.get_x()
+        y = pdf.get_y()
+        pdf.set_xy(x,y)       
+        pdf.multi_cell(10,15," N° ",border=1,align='C')
+        pdf.set_xy(x+10,y)       
+        pdf.multi_cell(46,15,"Preescripcion",border=1,align='C')
+        pdf.set_xy(x+56,y)       
+        pdf.multi_cell(27,7.5,"Unidades por toma(dias)",border=1,align='C')
+        pdf.set_xy(x+83,y)       
+        pdf.multi_cell(27,7.5,"Periodo entre toma",border=1,align='C')
+        #Tabla indicaciones
+        pdf.set_xy(x+110,y)       
+        pdf.multi_cell(40,15,"Obsevaciones",border=1,align='C')
+        pdf.set_xy(x+150,y)       
+        pdf.multi_cell(20,15,"Duracion",border=1,align='C')
+        pdf.set_xy(x+170,y)       
+        pdf.multi_cell(20,7.5,"Fecha final",border=1,align='C')
+
+        #llenar tabla
+
+        for i in range(0,len(self.data)):
+            x = pdf.get_x()
+            y = pdf.get_y()
+            for j in range(0,5):
+                str(self.data[i][j])
+                pdf.set_xy(x,y)   
+                #posologia    
+                pdf.multi_cell(10,10,str(self.data[i][0]),border=1,align='C')
+                pdf.set_xy(x+10,y)       
+                pdf.multi_cell(46,10,str(self.data[i][1]),border=1,align='C')
+                pdf.set_xy(x+56,y)       
+                pdf.multi_cell(27,10,str(self.data[i][2]),border=1,align='C')
+                pdf.set_xy(x+83,y)       
+                pdf.multi_cell(27,10,str(self.data[i][3]),border=1,align='C')
+                #indicaciones
+                pdf.set_xy(x+110,y)       
+                pdf.multi_cell(40,10,str(self.data[i][5]),border=1,align='C')
+                pdf.set_xy(x+150,y)       
+                pdf.multi_cell(20,10,str(self.data[i][4]),border=1,align='C')
+                pdf.set_xy(x+170,y)       
+                pdf.multi_cell(20,10,"-- ",border=1,align='C')
+            
+        #Indicaciones Adicionales
+        pdf.set_font('Times','B',size=13)
+        pdf.cell(0,20,ln=2)
+        pdf.cell(20,10,"Indicaciones Adicionales: ",align='L',ln=1)
+        pdf.set_font('Times',size=13)
+        pdf.cell(0,15,self.indicaciones,align='C',ln=1,border=1)
+
+        #Medico encargado
+        pdf.set_font('Times','B',size=13)
+        pdf.cell(0,20,ln=2)
+        x = pdf.get_x()
+        y = pdf.get_y()
+        pdf.set_xy(x+43,y)  
+        pdf.cell(110,20,ln=2,border=0,align='C')
+        pdf.cell(0,5,ln=2)
+        pdf.line(x+50,y+20,160,y+20)
+        pdf.set_line_width(1)
+        pdf.cell(115,1,"FIRMA Y SELLO DEL PROF. MEDICO: ",align='C',ln=1)
+        pdf.set_font('Times',size=13)
+        pdf.cell(0,5,ln=2)
+        pdf.cell(0,5,"Nombre: " + self.medico,align='C',ln=1)
+        pdf.cell(0,5,"CI: " + self.CMedico,align='C',ln=1)
+
+        #crear arcrivo
+        pdf.output(self.NombreArchivo)
 
 
 
 
 if __name__ == "__main__":
+    
     root = tk.Tk()
     root.config(background="white")
     root.resizable(0,0)
